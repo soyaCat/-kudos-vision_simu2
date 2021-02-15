@@ -135,8 +135,9 @@ class AgentsHelper:
                     vec_obs = decision_steps.obs[index]
 
         for index, vis_obs in enumerate(vis_obs_list):
-            vis_obs = self.ConversionDataType.ChangeArrayDimentionOrder_forPytorch(vis_obs)
-            vis_obs_list[index] = np.uint8(255*vis_obs)
+            print(np.shape(vis_obs[0]))
+            #vis_obs = self.ConversionDataType.ChangeArrayDimentionOrder_forPytorch(vis_obs[0])
+            vis_obs_list[index] = np.uint8(255*vis_obs[0])
         
         return vec_obs, vis_obs_list, done
 
