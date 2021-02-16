@@ -11,6 +11,7 @@ import cv2
 import random
 import CustomFuncionFor_mlAgent as CF
 from PIL import Image
+from tqdm import tqdm
 
 game = "-kudos-vision_simulator.exe"
 env_path = "./Build/"+game
@@ -19,12 +20,17 @@ env = UnityEnvironment(file_name = env_path)
 env.reset()
 behavior_names = list(env.behavior_specs)
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 13
+totalEpisodeCount = 1000
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 list_index_for_ALL = 0
 list_index_for_ball = 1
 list_index_for_flag = 2
 list_index_for_stage = 3
+
+generate_ball_map = False
+generate_stage = False
+generate_ball = False
+generate_flag = False
 
 def get_result_about_Is_same_1D_npArr(myArr1, myArr2):
     result = True
@@ -40,6 +46,7 @@ def get_rectangle_point_for_yolo(ball_npArr):
     '''
     im_width_size = np.shape(ball_npArr)[0]
     im_hight_size = np.shape(ball_npArr)[1]
+    ball_map_npArr = np.zeros((im_width_size, im_hight_size))
     candidate_width_list = []
     candidate_hight_list = []
 
@@ -52,6 +59,7 @@ def get_rectangle_point_for_yolo(ball_npArr):
                 if Is_width_list_append == False:
                     candidate_width_list.append(width)
                     Is_width_list_append = True
+                ball_map_npArr[width][hight] = 255
     left = 0 #큰수여야함
     bottom = 0#큰수여야함
     right = im_width_size#작은수여야함
@@ -69,7 +77,7 @@ def get_rectangle_point_for_yolo(ball_npArr):
         if bottom<candidate_hight:
             bottom = candidate_hight
 
-    return left, bottom, right, top
+    return left, bottom, right, top, ball_map_npArr
 
 def mapping_point_to_float_shape(npArr, left, bottom, right, top):
     im_width_size = np.shape(npArr)[0]
@@ -79,18 +87,31 @@ def mapping_point_to_float_shape(npArr, left, bottom, right, top):
     right = right/im_width_size
     top = top/im_hight_size
 
-    return round(left,6), round(bottom,6), round(right,6), round(top,6) #round(n,2)
+    return left, bottom, right, top #round(n,2)
 
 def write_txt_file_like_yolo_mark(episodeCount, left, bottom, right, top, write_data):
+    height_distance = bottom-top
+    width_distance = left-right
+    height_center = bottom-(height_distance/2)
+    width_center = left-(width_distance/2)
     f = open("./made_data/"+str(episodeCount)+"_ALL.txt", 'w')
     if write_data == True:
-        data = str(0)+" "+str(left)+" "+str(bottom)+" "+str(right)+" "+str(top)
+        data = str(0)+" "+str(round(height_center,6))+" "+str(round(width_center,6))+" "+str(round(height_distance, 6))+" "+str(round(width_distance, 6))
+        f.write(data)
+
+    f.close()
+
+def write_train_txt_file_for_yolo(totalEpisodeCount):
+    f = open("./made_data/"+"train.txt", 'w')
+    for i in range(totalEpisodeCount):
+        data = "data/kudos_obj/"+str(i)+"_ALL.jpg"+"\n"
         f.write(data)
 
     f.close()
 
 if __name__ == "__main__":
-    for episodeCount in range(totalEpisodeCount):
+    write_train_txt_file_for_yolo(totalEpisodeCount)
+    for episodeCount in tqdm(range(totalEpisodeCount)):
         behavior_name = behavior_names[0]
         decision_steps, terminal_steps = env.get_steps(behavior_name)
         vec_observation, vis_observation_list, done = AgentsHelper.getObservation(behavior_name)
@@ -98,18 +119,27 @@ if __name__ == "__main__":
 
         im = Image.fromarray(vis_observation_list[list_index_for_ALL].astype('uint8'), 'RGB')
         im.save(save_picture_path+str(episodeCount)+'_ALL.jpg')
-        im_stage = Image.fromarray(vis_observation_list[list_index_for_stage].astype('uint8'), 'RGB')
-        im_stage.save(save_picture_path+str(episodeCount)+'_stage.jpg')
-        im_ball = Image.fromarray(vis_observation_list[list_index_for_ball].astype('uint8'), 'RGB')
-        im_ball.save(save_picture_path+str(episodeCount)+'_ball.jpg')
-        im_flag = Image.fromarray(vis_observation_list[list_index_for_flag].astype('uint8'), 'RGB')
-        im_flag.save(save_picture_path+str(episodeCount)+'_flag.jpg')
+        if generate_stage == True:
+            im_stage = Image.fromarray(vis_observation_list[list_index_for_stage].astype('uint8'), 'RGB')
+            im_stage.save(save_picture_path+str(episodeCount)+'_stage.jpg')
+        if generate_ball == True:
+            im_ball = Image.fromarray(vis_observation_list[list_index_for_ball].astype('uint8'), 'RGB')
+            im_ball.save(save_picture_path+str(episodeCount)+'_ball.jpg')
+        if generate_flag == True:
+            im_flag = Image.fromarray(vis_observation_list[list_index_for_flag].astype('uint8'), 'RGB')
+            im_flag.save(save_picture_path+str(episodeCount)+'_flag.jpg')
 
         ball_npArr = vis_observation_list[list_index_for_ball]
-        left, bottom, right, top = get_rectangle_point_for_yolo(ball_npArr)
-        print(left, bottom, right, top)
+        left, bottom, right, top, ball_map_npArr = get_rectangle_point_for_yolo(ball_npArr)
+
+        if generate_ball_map == True:
+            im_ball_map = Image.fromarray(ball_map_npArr.astype('uint8'), 'L')
+            im_ball_map.save(save_picture_path+str(episodeCount)+'_ball_map.jpg')
+
+
+        #print(left, bottom, right, top)
         left, bottom, right, top = mapping_point_to_float_shape(ball_npArr, left, bottom, right, top)
-        print(left, bottom, right, top)
+        #print(left, bottom, right, top)
         result = get_result_about_Is_same_1D_npArr(np.array([left, bottom, right, top]), np.array([0.0, 0.0, 1.0, 1.0]))
         if result == False:
             write_txt_file_like_yolo_mark(episodeCount, left, bottom, right, top, True)
