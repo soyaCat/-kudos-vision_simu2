@@ -20,7 +20,7 @@ env = UnityEnvironment(file_name = env_path)
 env.reset()
 behavior_names = list(env.behavior_specs)
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 1000
+totalEpisodeCount = 2000
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 list_index_for_ALL = 0
 list_index_for_ball = 1
@@ -29,8 +29,8 @@ list_index_for_stage = 3
 
 generate_ball_map = False
 generate_stage = False
-generate_ball = False
 generate_flag = False
+generate_ball = False
 
 def get_result_about_Is_same_1D_npArr(myArr1, myArr2):
     result = True
