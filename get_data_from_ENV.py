@@ -20,7 +20,7 @@ env = UnityEnvironment(file_name = env_path)
 env.reset()
 behavior_names = list(env.behavior_specs)
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 300
+totalEpisodeCount = 1500
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 list_index_for_ALL = 0
 list_index_for_ball = 1
