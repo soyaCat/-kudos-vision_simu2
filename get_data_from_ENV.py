@@ -29,11 +29,11 @@ list_index_for_stage = 5
 list_index_for_goal1 = 4
 list_index_for_goal2 = 3
 
-generate_ball_map = True
-generate_stage = True
-generate_flag = True
-generate_ball = True
-generate_goal = True
+generate_ball_map = False
+generate_stage = False
+generate_flag = False
+generate_ball = False
+generate_goal = False
 generate_yolo_txt_file = True
 
 write_txt_file_ball_pos = True
@@ -250,4 +250,5 @@ if __name__ == "__main__":
         env.set_actions(behavior_name, actionTuple)
 
         env.step()
+    env.close()
 
