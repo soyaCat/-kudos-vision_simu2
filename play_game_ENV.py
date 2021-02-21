@@ -261,9 +261,8 @@ if __name__ == "__main__":
             goal1_pos = [g1_left, g1_bottom, g1_right, g1_top]
             goal2_pos = [g2_left, g2_bottom, g2_right, g2_top]
             write_txt_file_like_yolo_mark(episodeCount, ball_pos, goal1_pos, goal2_pos, ball_result, goal1_result, goal2_result)
+
         
-
-
         action = [2]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action,behavior_name)
         env.set_actions(behavior_name, actionTuple)
