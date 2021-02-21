@@ -21,23 +21,24 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 2
+totalEpisodeCount = 5
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
+write_file_name_list_index_instead_of_correct_name = False
 list_index_for_ALL = 0
 list_index_for_ball = 1
 list_index_for_flag = 2
-list_index_for_stage = 5
-list_index_for_goal1_detection = 4
-list_index_for_goal2_detection = 3
-list_index_for_goal1_range = 6
-list_index_for_goal2_range = 7
+list_index_for_stage = 7
+list_index_for_goal1_detection = 3
+list_index_for_goal2_detection = 5
+list_index_for_goal1_range = 4
+list_index_for_goal2_range = 6
 
-generate_ball_map = True
-generate_stage = True
-generate_flag = True
-generate_ball = True
-generate_goal_dectecion = True
-generate_goal_range = True
+generate_ball_map = False
+generate_stage = False
+generate_flag = False
+generate_ball = False
+generate_goal_dectecion = False
+generate_goal_range = False
 generate_yolo_txt_file = True
 
 write_txt_file_ball_pos = True
@@ -172,8 +173,6 @@ def write_txt_file_like_yolo_mark(episodeCount, ball_list, goal1_list, goal2_lis
         f.write(data)
 
     f.close()
-    
-
 
 def write_train_txt_file_for_yolo(totalEpisodeCount):
     f = open("./made_data/"+"train.txt", 'w')
@@ -182,6 +181,13 @@ def write_train_txt_file_for_yolo(totalEpisodeCount):
         f.write(data)
 
     f.close()
+
+def save_numpy_file(append_name, list_index, wfnliiocn):
+    im = Image.fromarray(vis_observation_list[list_index].astype('uint8'), 'RGB')
+    if wfnliiocn == False:
+        im.save(save_picture_path+str(episodeCount)+append_name+'.jpg')
+    else:
+        im.save(save_picture_path+str(list_index)+'.jpg')
 
 if __name__ == "__main__":
     write_train_txt_file_for_yolo(totalEpisodeCount)
@@ -193,27 +199,23 @@ if __name__ == "__main__":
 
         im = Image.fromarray(vis_observation_list[list_index_for_ALL].astype('uint8'), 'RGB')
         im.save(save_picture_path+str(episodeCount)+'_ALL.jpg')
+        wfnliiocn = write_file_name_list_index_instead_of_correct_name
         if generate_stage == True:
-            im_stage = Image.fromarray(vis_observation_list[list_index_for_stage].astype('uint8'), 'RGB')
-            im_stage.save(save_picture_path+str(episodeCount)+'_stage.jpg')
+            save_numpy_file('_stage', list_index_for_stage, wfnliiocn)
         if generate_ball == True:
-            im_ball = Image.fromarray(vis_observation_list[list_index_for_ball].astype('uint8'), 'RGB')
-            im_ball.save(save_picture_path+str(episodeCount)+'_ball.jpg')
+            save_numpy_file('_ball', list_index_for_ball, wfnliiocn)
         if generate_flag == True:
-            im_flag = Image.fromarray(vis_observation_list[list_index_for_flag].astype('uint8'), 'RGB')
-            im_flag.save(save_picture_path+str(episodeCount)+'_flag.jpg')
+            save_numpy_file('_flag', list_index_for_flag, wfnliiocn)
         if generate_goal_dectecion == True:
-            im_goal1 = Image.fromarray(vis_observation_list[list_index_for_goal1_detection].astype('uint8'), 'RGB')
-            im_goal1.save(save_picture_path+str(episodeCount)+'_goal1_detection.jpg')
-            im_goal2 = Image.fromarray(vis_observation_list[list_index_for_goal2_detection].astype('uint8'), 'RGB')
-            im_goal2.save(save_picture_path+str(episodeCount)+'_goal2_detection.jpg')
+            save_numpy_file('_goal1_detection', list_index_for_goal1_detection, wfnliiocn)
+            save_numpy_file('_goal2_detection', list_index_for_goal2_detection, wfnliiocn)
         if generate_goal_range == True:
-            im_goal1 = Image.fromarray(vis_observation_list[list_index_for_goal1_range].astype('uint8'), 'RGB')
-            im_goal1.save(save_picture_path+str(episodeCount)+'_goal1_range.jpg')
-            im_goal2 = Image.fromarray(vis_observation_list[list_index_for_goal2_range].astype('uint8'), 'RGB')
-            im_goal2.save(save_picture_path+str(episodeCount)+'_goal2_range.jpg')
+            save_numpy_file('_goal1_range', list_index_for_goal1_range, wfnliiocn)
+            save_numpy_file('_goal2_range', list_index_for_goal2_range, wfnliiocn)
 
         ball_npArr = vis_observation_list[list_index_for_ball]
+        goal1_detection_npArr = vis_observation_list[list_index_for_goal1_detection]
+        goal2_detection_npArr = vis_observation_list[list_index_for_goal2_detection]
         goal1_npArr = vis_observation_list[list_index_for_goal1_range]
         goal2_npArr = vis_observation_list[list_index_for_goal2_range]
         left = 0.0
@@ -230,17 +232,22 @@ if __name__ == "__main__":
         g2_top = 1.0
 
         if write_txt_file_ball_pos == True:
-            left, bottom, right, top, ball_map_npArr = get_rectangle_point_for_yolo(ball_npArr)
-            left, bottom, right, top = mapping_point_to_float_shape(ball_npArr, left, bottom, right, top)
+            if np.sum(ball_npArr) != 0:
+                left, bottom, right, top, ball_map_npArr = get_rectangle_point_for_yolo(ball_npArr)
+                left, bottom, right, top = mapping_point_to_float_shape(ball_npArr, left, bottom, right, top)
+            else:
+                ball_map_npArr = np.zeros_like(ball_npArr)
             if generate_ball_map == True:
                 im_ball_map = Image.fromarray(ball_map_npArr.astype('uint8'), 'L')
                 im_ball_map.save(save_picture_path+str(episodeCount)+'_ball_map.jpg')
 
         if write_txt_file_goal_pos == True:
-            g1_left, g1_bottom, g1_right, g1_top = get_rectangle_point_for_yolo_no_map(goal1_npArr)
-            g1_left, g1_bottom, g1_right, g1_top = mapping_point_to_float_shape(goal1_npArr, g1_left, g1_bottom, g1_right, g1_top)
-            g2_left, g2_bottom, g2_right, g2_top = get_rectangle_point_for_yolo_no_map(goal2_npArr)
-            g2_left, g2_bottom, g2_right, g2_top = mapping_point_to_float_shape(goal2_npArr, g2_left, g2_bottom, g2_right, g2_top)
+            if np.sum(goal1_detection_npArr) != 0:
+                g1_left, g1_bottom, g1_right, g1_top = get_rectangle_point_for_yolo_no_map(goal1_npArr)
+                g1_left, g1_bottom, g1_right, g1_top = mapping_point_to_float_shape(goal1_npArr, g1_left, g1_bottom, g1_right, g1_top)
+            if np.sum(goal2_detection_npArr) != 0: 
+                g2_left, g2_bottom, g2_right, g2_top = get_rectangle_point_for_yolo_no_map(goal2_npArr)
+                g2_left, g2_bottom, g2_right, g2_top = mapping_point_to_float_shape(goal2_npArr, g2_left, g2_bottom, g2_right, g2_top)
 
 
         ball_result = get_result_about_Is_same_1D_npArr(np.array([left, bottom, right, top]), np.array([0.0, 0.0, 1.0, 1.0]))
