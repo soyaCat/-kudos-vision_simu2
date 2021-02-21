@@ -19,21 +19,25 @@ save_picture_path = "./made_data/"
 env = UnityEnvironment(file_name = env_path)
 env.reset()
 behavior_names = list(env.behavior_specs)
+
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 1500
+totalEpisodeCount = 2
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 list_index_for_ALL = 0
 list_index_for_ball = 1
 list_index_for_flag = 2
 list_index_for_stage = 5
-list_index_for_goal1 = 4
-list_index_for_goal2 = 3
+list_index_for_goal1_detection = 4
+list_index_for_goal2_detection = 3
+list_index_for_goal1_range = 6
+list_index_for_goal2_range = 7
 
-generate_ball_map = False
-generate_stage = False
-generate_flag = False
-generate_ball = False
-generate_goal = False
+generate_ball_map = True
+generate_stage = True
+generate_flag = True
+generate_ball = True
+generate_goal_dectecion = True
+generate_goal_range = True
 generate_yolo_txt_file = True
 
 write_txt_file_ball_pos = True
@@ -198,15 +202,20 @@ if __name__ == "__main__":
         if generate_flag == True:
             im_flag = Image.fromarray(vis_observation_list[list_index_for_flag].astype('uint8'), 'RGB')
             im_flag.save(save_picture_path+str(episodeCount)+'_flag.jpg')
-        if generate_goal == True:
-            im_goal1 = Image.fromarray(vis_observation_list[list_index_for_goal1].astype('uint8'), 'RGB')
-            im_goal1.save(save_picture_path+str(episodeCount)+'_goal1.jpg')
-            im_goal2 = Image.fromarray(vis_observation_list[list_index_for_goal2].astype('uint8'), 'RGB')
-            im_goal2.save(save_picture_path+str(episodeCount)+'_goal2.jpg')
+        if generate_goal_dectecion == True:
+            im_goal1 = Image.fromarray(vis_observation_list[list_index_for_goal1_detection].astype('uint8'), 'RGB')
+            im_goal1.save(save_picture_path+str(episodeCount)+'_goal1_detection.jpg')
+            im_goal2 = Image.fromarray(vis_observation_list[list_index_for_goal2_detection].astype('uint8'), 'RGB')
+            im_goal2.save(save_picture_path+str(episodeCount)+'_goal2_detection.jpg')
+        if generate_goal_range == True:
+            im_goal1 = Image.fromarray(vis_observation_list[list_index_for_goal1_range].astype('uint8'), 'RGB')
+            im_goal1.save(save_picture_path+str(episodeCount)+'_goal1_range.jpg')
+            im_goal2 = Image.fromarray(vis_observation_list[list_index_for_goal2_range].astype('uint8'), 'RGB')
+            im_goal2.save(save_picture_path+str(episodeCount)+'_goal2_range.jpg')
 
         ball_npArr = vis_observation_list[list_index_for_ball]
-        goal1_npArr = vis_observation_list[list_index_for_goal1]
-        goal2_npArr = vis_observation_list[list_index_for_goal2]
+        goal1_npArr = vis_observation_list[list_index_for_goal1_range]
+        goal2_npArr = vis_observation_list[list_index_for_goal2_range]
         left = 0.0
         bottom = 0.0
         right = 1.0
@@ -245,7 +254,7 @@ if __name__ == "__main__":
             goal2_pos = [g2_left, g2_bottom, g2_right, g2_top]
             write_txt_file_like_yolo_mark(episodeCount, ball_pos, goal1_pos, goal2_pos, ball_result, goal1_result, goal2_result)
         
-        action = [1]
+        action = [2]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action,behavior_name)
         env.set_actions(behavior_name, actionTuple)
 
