@@ -21,7 +21,7 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 1500
+totalEpisodeCount = 2
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
 list_index_for_ALL = 0
@@ -33,12 +33,12 @@ list_index_for_goal2_detection = 5
 list_index_for_goal1_range = 4
 list_index_for_goal2_range = 6
 
-generate_ball_map = False
-generate_stage = False
-generate_flag = False
-generate_ball = False
-generate_goal_dectecion = False
-generate_goal_range = False
+generate_ball_map = True
+generate_stage = True
+generate_flag = True
+generate_ball = True
+generate_goal_dectecion = True
+generate_goal_range = True
 generate_yolo_txt_file = True
 
 write_txt_file_ball_pos = True
