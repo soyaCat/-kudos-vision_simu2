@@ -61,13 +61,30 @@ public class robotAgent : Agent
         switch (act0)
         {
             case 1:
-                nextPose = 1;
+                nextPose = 1;//테스트 모드: 로봇과 오브젝트들의 위치가 고정됨
                 break;
-            case 0:
-                nextPose = 0;
+            case 2:
+                nextPose = 2;//디폴트 모드:로봇과 공의 위치가 랜덤
+                break;
+            case 3:
+                nextPose = 3;//매핑모드: 로봇머리의 팬 틸트가 고정됨
                 break;
         }
-        if (nextPose == 1)
+        if(nextPose == 1)
+        {
+            for (int i = 0; i < footballs.Count(); i++)
+            {
+                if (i != randomInt)
+                    footballs[i].gameObject.SetActive(false);
+                else
+                    footballs[i].gameObject.SetActive(true);
+            }
+            handleRobot.transform.position = new Vector3(0f, 2f, -7f);
+            cameraPack.transform.eulerAngles = new Vector3(0f, 0f, 0f);
+            footballs[randomInt].transform.position = new Vector3(0f, 0.5f, 0f);
+            footballs[randomInt].transform.eulerAngles= new Vector3(Random.Range(0f,180f), Random.Range(0f,180f), Random.Range(0f,180f));
+        }
+        else if(nextPose == 2)
         {
             for (int i = 0; i < footballs.Count(); i++)
             {
@@ -83,6 +100,7 @@ public class robotAgent : Agent
                 if (distance_Robot_ball >= 8f)
                 {
                     footballs[randomInt].transform.position = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
+                    footballs[randomInt].transform.eulerAngles = new Vector3(Random.Range(0f, 180f), Random.Range(0f, 180f), Random.Range(0f, 180f));
                     distance_Robot_ball = Vector3.Distance(handleRobot.transform.position, footballs[randomInt].transform.position);
                 }
                 else
@@ -112,7 +130,6 @@ public class robotAgent : Agent
         footballs.Add(ball_sp3);
 
         var randomInt = Random.Range(0, footballs.Count());
-        var randomLookAtPosition = new Vector3(0f, 0f, 0f);
         for (int i = 0; i < footballs.Count(); i++)
         {
             if (i != randomInt)
@@ -120,20 +137,23 @@ public class robotAgent : Agent
             else
                 footballs[i].gameObject.SetActive(true);
         }
-        handleRobot.transform.position = new Vector3(Random.Range(-6f, 6f), 1.875f, Random.Range(-11f, 11f));
-        footballs[randomInt].transform.position = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
-        randomLookAtPosition = footballs[randomInt].transform.position + new Vector3(Random.Range(-6f, 6f), 0f, Random.Range(-6f, 6f));
-        lookAtTarget.transform.position = randomLookAtPosition;
-        cameraPack.transform.LookAt(lookAtTarget.transform);
+        handleRobot.transform.position = new Vector3(0f, 2f, -7f);
+        cameraPack.transform.eulerAngles = new Vector3(0f, 0f, 0f);
+        footballs[randomInt].transform.position = new Vector3(0f, 0.5f, 0f);
+        footballs[randomInt].transform.eulerAngles = new Vector3(Random.Range(0f, 180f), Random.Range(0f, 180f), Random.Range(0f, 180f));
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var DiscreteActionsout = actionsOut.DiscreteActions;
         DiscreteActionsout[0] = 0;
-        if (Input.GetKey(KeyCode.N))
+        if (Input.GetKey(KeyCode.D))
         {
             DiscreteActionsout[0] = 1;
+        }
+        if (Input.GetKey(KeyCode.N))
+        {
+            DiscreteActionsout[0] = 2;
         }
     }
 }
