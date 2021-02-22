@@ -1,5 +1,6 @@
 from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.base_env import ActionTuple
+from mlagents_envs.side_channel.engine_configuration_channel import EngineConfigurationChannel
 import numpy as np
 import datetime
 import time
@@ -18,12 +19,14 @@ from tqdm import tqdm
 game = "-kudos-vision_simulator.exe"
 env_path = "./Build/"+game
 save_picture_path = "./made_data/"
-env = UnityEnvironment(file_name = env_path)
+channel = EngineConfigurationChannel()
+channel.set_configuration_parameters(time_scale = 1.0, target_frame_rate = 30, capture_frame_rate = 60)
+env = UnityEnvironment(file_name = env_path, side_channels = [channel])
 env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 1000
+totalEpisodeCount = 100
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
 list_index_for_ALL = 0
