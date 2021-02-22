@@ -6,6 +6,8 @@ import time
 import math
 from collections import deque
 import os
+import zmq
+import zmqnumpy as znp
 
 import cv2
 import random
@@ -21,7 +23,7 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 2
+totalEpisodeCount = 1000
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
 list_index_for_ALL = 0
@@ -192,6 +194,13 @@ def save_numpy_file(append_name, list_index, wfnliiocn):
 
 if __name__ == "__main__":
     write_train_txt_file_for_yolo(totalEpisodeCount)
+    context = zmq.Context()
+    socket = context.socket(zmq.REP)
+    socket.bind("tcp://*:9010")
+    print("wait receive message from client...")
+    message = socket.recv()
+    print("message: ", message)
+
     for episodeCount in tqdm(range(totalEpisodeCount)):
         behavior_name = behavior_names[0]
         decision_steps, terminal_steps = env.get_steps(behavior_name)
@@ -214,53 +223,11 @@ if __name__ == "__main__":
             save_numpy_file('_goal1_range', list_index_for_goal1_range, wfnliiocn)
             save_numpy_file('_goal2_range', list_index_for_goal2_range, wfnliiocn)
 
-        ball_npArr = vis_observation_list[list_index_for_ball]
-        goal1_detection_npArr = vis_observation_list[list_index_for_goal1_detection]
-        goal2_detection_npArr = vis_observation_list[list_index_for_goal2_detection]
-        goal1_npArr = vis_observation_list[list_index_for_goal1_range]
-        goal2_npArr = vis_observation_list[list_index_for_goal2_range]
-        left = 0.0
-        bottom = 0.0
-        right = 1.0
-        top = 1.0
-        g1_left = 0.0
-        g1_bottom = 0.0
-        g1_right = 1.0
-        g1_top = 1.0
-        g2_left = 0.0
-        g2_bottom = 0.0
-        g2_right = 1.0
-        g2_top = 1.0
+        ALL_npArr = vis_observation_list[list_index_for_ALL]
+        znp.send_array(socket, ALL_npArr)
 
-        if write_txt_file_ball_pos == True:
-            if np.sum(ball_npArr) != 0:
-                left, bottom, right, top, ball_map_npArr = get_rectangle_point_for_yolo(ball_npArr)
-                left, bottom, right, top = mapping_point_to_float_shape(ball_npArr, left, bottom, right, top)
-            else:
-                ball_map_npArr = np.zeros_like(ball_npArr)
-            if generate_ball_map == True:
-                im_ball_map = Image.fromarray(ball_map_npArr.astype('uint8'), 'L')
-                im_ball_map.save(save_picture_path+str(episodeCount)+'_ball_map.jpg')
-
-        if write_txt_file_goal_pos == True:
-            if np.sum(goal1_detection_npArr) != 0:
-                g1_left, g1_bottom, g1_right, g1_top = get_rectangle_point_for_yolo_no_map(goal1_npArr)
-                g1_left, g1_bottom, g1_right, g1_top = mapping_point_to_float_shape(goal1_npArr, g1_left, g1_bottom, g1_right, g1_top)
-            if np.sum(goal2_detection_npArr) != 0: 
-                g2_left, g2_bottom, g2_right, g2_top = get_rectangle_point_for_yolo_no_map(goal2_npArr)
-                g2_left, g2_bottom, g2_right, g2_top = mapping_point_to_float_shape(goal2_npArr, g2_left, g2_bottom, g2_right, g2_top)
-
-
-        ball_result = get_result_about_Is_same_1D_npArr(np.array([left, bottom, right, top]), np.array([0.0, 0.0, 1.0, 1.0]))
-        goal1_result = get_result_about_Is_same_1D_npArr(np.array([g1_left, g1_bottom, g1_right, g1_top]), np.array([0.0, 0.0, 1.0, 1.0]))
-        goal2_result = get_result_about_Is_same_1D_npArr(np.array([g2_left, g2_bottom, g2_right, g2_top]), np.array([0.0, 0.0, 1.0, 1.0]))
-
-
-        if generate_yolo_txt_file == True:
-            ball_pos = [left, bottom, right, top]
-            goal1_pos = [g1_left, g1_bottom, g1_right, g1_top]
-            goal2_pos = [g2_left, g2_bottom, g2_right, g2_top]
-            write_txt_file_like_yolo_mark(episodeCount, ball_pos, goal1_pos, goal2_pos, ball_result, goal1_result, goal2_result)
+        received_position_npArr = znp.recv_array(socket)
+        print("receive msg from client:", received_position_npArr)
 
         
         action = [2]
