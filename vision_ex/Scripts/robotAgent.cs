@@ -26,6 +26,11 @@ public class robotAgent : Agent
 
     private List<GameObject> footballs = new List<GameObject>();
 
+    void Start()
+    {
+
+    }
+
 
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -56,8 +61,9 @@ public class robotAgent : Agent
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
         var act0 = actionBuffers.DiscreteActions[0];
-        var act1 = actionBuffers.DiscreteActions[1];
-        var act2 = actionBuffers.DiscreteActions[2];
+        var move_mode = actionBuffers.DiscreteActions[1];
+        var head_horizen = actionBuffers.DiscreteActions[2];
+        var head_vertical = actionBuffers.DiscreteActions[3];
         var nextPose = 0;
         var randomInt = Random.Range(0, footballs.Count());
         var randomLookAtPosition = new Vector3(0f, 0f, 0f);
@@ -117,7 +123,36 @@ public class robotAgent : Agent
         else if(nextPose == 3)
         {
             var current_Robot_position = handleRobot.transform.position;
-
+            var current_Robot_Angle = handleRobot.transform.eulerAngles;
+            var next_move_point = new Vector3(0f, 0f, 0f);
+            var next_lot_point = new Vector3(0f, 0f, 0f);
+            if(move_mode == 8)
+            {
+                next_move_point = current_Robot_position + handleRobot.transform.forward*0.5f;
+                next_lot_point = current_Robot_Angle;
+            }
+            else if (move_mode == 2)
+            {
+                next_move_point = current_Robot_position + handleRobot.transform.forward * -0.5f;
+                next_lot_point = current_Robot_Angle;
+            }
+            else if (move_mode == 4)
+            {
+                next_move_point = current_Robot_position;
+                next_lot_point = current_Robot_Angle + new Vector3(0f, -10f, 0f);
+            }
+            else if (move_mode == 6)
+            {
+                next_move_point = current_Robot_position;
+                next_lot_point = current_Robot_Angle + new Vector3(0f, 10f, 0f);
+            }
+            else
+            {
+                next_move_point = current_Robot_position;
+                next_lot_point = current_Robot_Angle;
+            }
+            handleRobot.transform.position = Vector3.MoveTowards(handleRobot.transform.position, next_move_point, 0.1f);
+            handleRobot.transform.eulerAngles = Vector3.MoveTowards(handleRobot.transform.eulerAngles, next_lot_point, 0.1f);
         }
 
     }
@@ -138,7 +173,7 @@ public class robotAgent : Agent
         footballs.Add(ball_sp3);
 
         var randomInt = Random.Range(0, footballs.Count());
-        Soccer_Ball.SetActive(false);
+        //Soccer_Ball.SetActive(false);
         for (int i = 0; i < footballs.Count(); i++)
         {
             if (i != randomInt)
@@ -158,13 +193,45 @@ public class robotAgent : Agent
         DiscreteActionsout[0] = 0;
         DiscreteActionsout[1] = 0;
         DiscreteActionsout[2] = 0;
-        if (Input.GetKey(KeyCode.D))
+        DiscreteActionsout[3] = 0;
+        if (Input.GetKey(KeyCode.M))
         {
             DiscreteActionsout[0] = 1;
         }
         if (Input.GetKey(KeyCode.N))
         {
             DiscreteActionsout[0] = 2;
+        }
+        if (Input.GetKey(KeyCode.W))
+        {
+            DiscreteActionsout[0] = 3;
+            DiscreteActionsout[1] = 8;
+
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            DiscreteActionsout[0] = 3;
+            DiscreteActionsout[1] = 4;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            DiscreteActionsout[0] = 3;
+            DiscreteActionsout[1] = 2;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            DiscreteActionsout[0] = 3;
+            DiscreteActionsout[1] = 6;
+        }
+        if (Input.GetKey(KeyCode.Q))
+        {
+            DiscreteActionsout[0] = 3;
+            DiscreteActionsout[2] = 60;
+        }
+        if (Input.GetKey(KeyCode.E))
+        {
+            DiscreteActionsout[0] = 3;
+            DiscreteActionsout[3] = 30;
         }
     }
 }
