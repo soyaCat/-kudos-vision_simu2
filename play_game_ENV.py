@@ -16,8 +16,10 @@ import CustomFuncionFor_mlAgent as CF
 from PIL import Image
 from tqdm import tqdm
 
-game = "-kudos-vision_simulator.exe"
-env_path = "./Build/"+game
+#game = "-kudos-vision_simulator.exe"
+#env_path = "./Build/"+game
+game = "kudos_vision_simulator.x86_64"
+env_path = "./Linux_build/"+game
 save_picture_path = "./made_data/"
 channel = EngineConfigurationChannel()
 channel.set_configuration_parameters(time_scale = 1.0, target_frame_rate = 60, capture_frame_rate = 60)
