@@ -202,6 +202,14 @@ def save_numpy_file(append_name, list_index, wfnliiocn):
     else:
         im.save(save_picture_path+str(list_index)+'.jpg')
 
+def change_numpy_rgb_to_bgr(npArr):
+    bgr_npArr = np.zeros_like(npArr)
+    bgr_npArr[:,:,0:1] = npArr[:,:,2:]
+    bgr_npArr[:,:,1:2] = npArr[:,:,1:2]
+    bgr_npArr[:,:,2:] = npArr[:,:,0:1]
+
+    return bgr_npArr
+
 if __name__ == "__main__":
     write_train_txt_file_for_yolo(totalEpisodeCount)
     context = zmq.Context()
@@ -234,6 +242,7 @@ if __name__ == "__main__":
             save_numpy_file('_goal2_range', list_index_for_goal2_range, wfnliiocn)
 
         ALL_npArr = vis_observation_list[list_index_for_ALL]
+        ALL_npArr = change_numpy_rgb_to_bgr(ALL_npArr)
         znp.send_array(socket, ALL_npArr)
 
         received_position_npArr = znp.recv_array(socket)
