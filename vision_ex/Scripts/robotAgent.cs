@@ -19,6 +19,7 @@ public class robotAgent : Agent
     public GameObject ball_sp1;
     public GameObject ball_sp2;
     public GameObject ball_sp3;
+    public GameObject Soccer_Ball;
     public GameObject cameraPack;
     public GameObject lookAtTarget;
     public GameObject handleRobot;
@@ -55,6 +56,8 @@ public class robotAgent : Agent
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
         var act0 = actionBuffers.DiscreteActions[0];
+        var act1 = actionBuffers.DiscreteActions[1];
+        var act2 = actionBuffers.DiscreteActions[2];
         var nextPose = 0;
         var randomInt = Random.Range(0, footballs.Count());
         var randomLookAtPosition = new Vector3(0f, 0f, 0f);
@@ -67,7 +70,7 @@ public class robotAgent : Agent
                 nextPose = 2;//디폴트 모드:로봇과 공의 위치가 랜덤
                 break;
             case 3:
-                nextPose = 3;//매핑모드: 로봇머리의 팬 틸트가 고정됨
+                nextPose = 3;//조종 모드: 로봇을 파이썬에서 조종할수 있게 함
                 break;
         }
         if(nextPose == 1)
@@ -111,6 +114,11 @@ public class robotAgent : Agent
             lookAtTarget.transform.position = randomLookAtPosition;
             cameraPack.transform.LookAt(lookAtTarget.transform);
         }
+        else if(nextPose == 3)
+        {
+            var current_Robot_position = handleRobot.transform.position;
+
+        }
 
     }
 
@@ -130,6 +138,7 @@ public class robotAgent : Agent
         footballs.Add(ball_sp3);
 
         var randomInt = Random.Range(0, footballs.Count());
+        Soccer_Ball.SetActive(false);
         for (int i = 0; i < footballs.Count(); i++)
         {
             if (i != randomInt)
@@ -147,6 +156,8 @@ public class robotAgent : Agent
     {
         var DiscreteActionsout = actionsOut.DiscreteActions;
         DiscreteActionsout[0] = 0;
+        DiscreteActionsout[1] = 0;
+        DiscreteActionsout[2] = 0;
         if (Input.GetKey(KeyCode.D))
         {
             DiscreteActionsout[0] = 1;
