@@ -1,3 +1,8 @@
+import sys
+try:
+    sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+except:
+    pass
 from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.base_env import ActionTuple
 from mlagents_envs.side_channel.engine_configuration_channel import EngineConfigurationChannel
