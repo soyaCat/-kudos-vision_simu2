@@ -211,6 +211,9 @@ def change_numpy_rgb_to_bgr(npArr):
 
     return bgr_npArr
 
+def set_action(rpnA):
+    
+
 if __name__ == "__main__":
     write_train_txt_file_for_yolo(totalEpisodeCount)
     context = zmq.Context()
@@ -249,8 +252,8 @@ if __name__ == "__main__":
         received_position_npArr = znp.recv_array(socket)
         print("receive msg from client:", received_position_npArr)
 
-        
-        action = [2,0,0,0]
+        action = set_action(received_position_npArr)
+        #action = [2,0,0,0]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action,behavior_name)
         env.set_actions(behavior_name, actionTuple)
 
