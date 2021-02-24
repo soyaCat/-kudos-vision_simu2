@@ -81,6 +81,7 @@ public class robotAgent : Agent
         }
         if(nextPose == 1)
         {
+            Soccer_Ball.SetActive(false);
             for (int i = 0; i < footballs.Count(); i++)
             {
                 if (i != randomInt)
@@ -95,6 +96,7 @@ public class robotAgent : Agent
         }
         else if(nextPose == 2)
         {
+            Soccer_Ball.SetActive(false);
             for (int i = 0; i < footballs.Count(); i++)
             {
                 if (i != randomInt)
@@ -119,32 +121,39 @@ public class robotAgent : Agent
             randomLookAtPosition = footballs[randomInt].transform.position + new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f))*(Balldistance/2.3f);
             lookAtTarget.transform.position = randomLookAtPosition;
             cameraPack.transform.LookAt(lookAtTarget.transform);
+            handleRobot.transform.eulerAngles = new Vector3(0f,cameraPack.transform.eulerAngles.y,0f);
+            cameraPack.transform.eulerAngles = new Vector3(cameraPack.transform.eulerAngles.x, handleRobot.transform.eulerAngles.y, 0f);
         }
         else if(nextPose == 3)
         {
+            for (int i = 0; i < footballs.Count(); i++)
+            {
+                footballs[i].gameObject.SetActive(false);
+            }
+            Soccer_Ball.SetActive(true);
             var current_Robot_position = handleRobot.transform.position;
             var current_Robot_Angle = handleRobot.transform.eulerAngles;
             var next_move_point = new Vector3(0f, 0f, 0f);
             var next_lot_point = new Vector3(0f, 0f, 0f);
             if(move_mode == 8)
             {
-                next_move_point = current_Robot_position + handleRobot.transform.forward*0.5f;
+                next_move_point = current_Robot_position + handleRobot.transform.forward*0.25f;
                 next_lot_point = current_Robot_Angle;
             }
             else if (move_mode == 2)
             {
-                next_move_point = current_Robot_position + handleRobot.transform.forward * -0.5f;
+                next_move_point = current_Robot_position + handleRobot.transform.forward * -0.25f;
                 next_lot_point = current_Robot_Angle;
             }
             else if (move_mode == 4)
             {
                 next_move_point = current_Robot_position;
-                next_lot_point = current_Robot_Angle + new Vector3(0f, -10f, 0f);
+                next_lot_point = current_Robot_Angle + new Vector3(0f, -20f, 0f);
             }
             else if (move_mode == 6)
             {
                 next_move_point = current_Robot_position;
-                next_lot_point = current_Robot_Angle + new Vector3(0f, 10f, 0f);
+                next_lot_point = current_Robot_Angle + new Vector3(0f, 20f, 0f);
             }
             else
             {
@@ -153,6 +162,7 @@ public class robotAgent : Agent
             }
             handleRobot.transform.position = Vector3.MoveTowards(handleRobot.transform.position, next_move_point, 0.1f);
             handleRobot.transform.eulerAngles = Vector3.MoveTowards(handleRobot.transform.eulerAngles, next_lot_point, 0.1f);
+            cameraPack.transform.eulerAngles = new Vector3(head_vertical * 1f, head_horizen * 1f, 0f)+handleRobot.transform.eulerAngles;
         }
 
     }
@@ -173,7 +183,7 @@ public class robotAgent : Agent
         footballs.Add(ball_sp3);
 
         var randomInt = Random.Range(0, footballs.Count());
-        //Soccer_Ball.SetActive(false);
+        Soccer_Ball.SetActive(false);
         for (int i = 0; i < footballs.Count(); i++)
         {
             if (i != randomInt)
