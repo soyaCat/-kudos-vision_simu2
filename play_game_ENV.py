@@ -249,7 +249,7 @@ if __name__ == "__main__":
         print("receive msg from client:", received_position_npArr)
 
         
-        action = [2]
+        action = [2,0,0,0]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action,behavior_name)
         env.set_actions(behavior_name, actionTuple)
 
