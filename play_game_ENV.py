@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 import sys
 try:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')

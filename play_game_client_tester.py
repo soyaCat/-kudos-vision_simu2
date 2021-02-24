@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 import zmq
 import zmqnumpy as znp
 import numpy as np
