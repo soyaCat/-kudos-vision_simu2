@@ -211,8 +211,49 @@ def change_numpy_rgb_to_bgr(npArr):
 
     return bgr_npArr
 
-def set_action(rpnA):
-    
+class Robot_Movement_argorithm():
+    def __init__(self):
+        self.headPan = 0
+        self.headTilt = 0
+        self.headPanMin = -120
+        self.headPanMax = 120
+        self.headTiltMin = 60
+        self.headTiltMax = 0
+        self.ball_find_level = 0
+        self.ball_scope_level = 0
+        self.mode_order_list = ["find_ball_and_set_robot_direct_to_ball"]
+
+    def set_action(self,rpnA, mode):
+        #npnA[ballPosX, ballPosY, goalPosX, goalPosY]
+        #action[3(조종모드), (2,4,6,8)키 패드에 따른 로봇 움직이기, 머리 팬(-360~360), 머리 틸트(-360~360)]
+        action = [3,0,0,0]
+
+        if mode == self.mode_order_list[0]:
+            if rpnA[0] == -1.0 and rpnA[1] == -1.0:
+                #볼이 없을 때
+                #초기화
+                self.ball_scope_level = 0
+
+                #작동 코드
+                if self.ball_find_level == 0:
+                    action[3] = 60
+                    self.ball_find_level = 1
+                elif self.ball_find_level == 1:
+                    action[3] = action[3] + 10
+                    if action[3]>=0:
+                        self.ball_find_level = 2
+                elif self.ball_find_level == 2:
+                    action[1] = 4
+                    self.ball_find_level == 0
+                
+            else:
+                #볼이 있을 때
+                #초기화
+                self.ball_find_level = 0
+
+                #작동 코드
+                
+
 
 if __name__ == "__main__":
     write_train_txt_file_for_yolo(totalEpisodeCount)
@@ -252,8 +293,8 @@ if __name__ == "__main__":
         received_position_npArr = znp.recv_array(socket)
         print("receive msg from client:", received_position_npArr)
 
-        action = set_action(received_position_npArr)
-        #action = [2,0,0,0]
+        action = set_action(received_position_npArr,"find_ball_and_set_robot_direct_to_ball")
+        action = [2,0,0,0]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action,behavior_name)
         env.set_actions(behavior_name, actionTuple)
 
