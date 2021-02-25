@@ -34,7 +34,7 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 100
+totalEpisodeCount = 500
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
 list_index_for_ALL = 0
@@ -221,6 +221,8 @@ class Robot_Movement_argorithm():
         self.headTiltMax = 0
         self.ball_find_level = 0
         self.ball_scope_level = 0
+        self.action = [3, 0, 0, 0]
+        self.sidemoveCount = 0
         self.mode_order_list = ["find_ball_and_set_robot_direct_to_ball"]
 
     def manualmode(self):
@@ -246,7 +248,6 @@ class Robot_Movement_argorithm():
     def set_action(self,rpnA, mode):
         #npnA[ballPosX, ballPosY, goalPosX, goalPosY]
         #action[3(조종모드), (2,4,6,8)키 패드에 따른 로봇 움직이기, 머리 팬(-360~360), 머리 틸트(-360~360)]
-        action = [3,0,0,0]
 
         if mode == self.mode_order_list[0]:
             if rpnA[0] == -1.0 and rpnA[1] == -1.0:
@@ -256,15 +257,20 @@ class Robot_Movement_argorithm():
 
                 #작동 코드
                 if self.ball_find_level == 0:
-                    action[3] = 60
+                    self.action[1] = 0
+                    self.action[2] = 0
+                    self.action[3] = 60
+                    self.sidemoveCount = 0
                     self.ball_find_level = 1
                 elif self.ball_find_level == 1:
-                    action[3] = action[3] + 10
-                    if action[3]>=0:
+                    self.action[3] = self.action[3] - 10
+                    if self.action[3]<=0:
                         self.ball_find_level = 2
                 elif self.ball_find_level == 2:
-                    action[1] = 4
-                    self.ball_find_level == 0
+                    self.action[1] = 4
+                    self.sidemoveCount = self.sidemoveCount + 1
+                    if self.sidemoveCount>40:
+                        self.ball_find_level = 0
                 
             else:
                 #볼이 있을 때
@@ -272,6 +278,14 @@ class Robot_Movement_argorithm():
                 self.ball_find_level = 0
 
                 #작동 코드
+                if self.ball_scope_level == 0:
+                    self.action[1] = 0
+                    if rpnA[0]>=0.6:
+                        self.action[2] = self.action[2] + 5
+                    elif rpnA[0]<=0.4:
+                        self.action[2] = self.action[2] - 5
+
+        return self.action
                 
 
 
