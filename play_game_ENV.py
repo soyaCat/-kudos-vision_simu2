@@ -34,7 +34,7 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 500
+totalEpisodeCount = 2000
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
 list_index_for_ALL = 0
@@ -288,6 +288,7 @@ class Robot_Movement_argorithm():
                         self.action[2] = self.action[2] - 5
                     else:
                         self.ball_scope_level = 1
+
                 elif self.ball_scope_level == 1:
                     self.action[1] = 0
                     if rpnA[1]>=0.55:
@@ -296,19 +297,24 @@ class Robot_Movement_argorithm():
                         self.action[3] = self.action[3] - 5
                     else:
                         self.ball_scope_level = 2
+
                 elif self.ball_scope_level == 2:
-                    print("scope head finish..")
-                    if self.action[3] >= 5:
-                        self.action[1] = 4
-                        self.ball_scope_level = 0
-                        print("Setting 5")
-                    elif self.action[3] <= -5:
+                    if self.action[2] >= 5:
                         self.action[1] = 6
                         self.ball_scope_level = 0
-                        print("Setting -5")
+                    elif self.action[2] <= -5:
+                        self.action[1] = 4
+                        self.ball_scope_level = 0
                     else:
                         self.action[1] = 0
+                        self.ball_scope_level = 3
+
+                elif self.ball_scope_level == 3:
+                    if self.action[3] < 70:
+                        self.action[1] = 8
                         self.ball_scope_level = 0
+
+
 
 
                     #env.close()
