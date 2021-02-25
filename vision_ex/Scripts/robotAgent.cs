@@ -161,7 +161,7 @@ public class robotAgent : Agent
                 next_lot_point = current_Robot_Angle;
             }
             handleRobot.transform.position = Vector3.MoveTowards(handleRobot.transform.position, next_move_point, 0.1f);
-            handleRobot.transform.eulerAngles = Vector3.MoveTowards(handleRobot.transform.eulerAngles, next_lot_point, 0.1f);
+            handleRobot.transform.eulerAngles = Vector3.MoveTowards(handleRobot.transform.eulerAngles, next_lot_point, 0.5f);
             cameraPack.transform.eulerAngles = new Vector3(head_vertical * 1f, head_horizen * 1f, 0f)+handleRobot.transform.eulerAngles;
         }
 
