@@ -288,7 +288,6 @@ class Robot_Movement_argorithm():
                         self.action[2] = self.action[2] - 5
                     else:
                         self.ball_scope_level = 1
-
                 elif self.ball_scope_level == 1:
                     self.action[1] = 0
                     if rpnA[1]>=0.55:
@@ -299,7 +298,20 @@ class Robot_Movement_argorithm():
                         self.ball_scope_level = 2
                 elif self.ball_scope_level == 2:
                     print("scope head finish..")
-                    env.close()
+                    if self.action[3] >= 5:
+                        self.action[1] = 4
+                        self.ball_scope_level = 0
+                        print("Setting 5")
+                    elif self.action[3] <= -5:
+                        self.action[1] = 6
+                        self.ball_scope_level = 0
+                        print("Setting -5")
+                    else:
+                        self.action[1] = 0
+                        self.ball_scope_level = 0
+
+
+                    #env.close()
 
         return self.action
 
