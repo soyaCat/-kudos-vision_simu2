@@ -227,7 +227,7 @@ class Robot_Movement_argorithm():
 
     def manualmode(self):
         print("Manual Mode...")
-        print("you can handle your robot by input 'w,a,s,d' and finish manual mode by input 'n'...")
+        print("you can handle your robot by input 'w,a,s,d' and finish manual mode by input 'n'..., move robot randomly by input'm'.... ")
         action = [3,0,0,0]
         finish_manualMode = False
         userInput = input("UserInput :: ")
@@ -239,6 +239,8 @@ class Robot_Movement_argorithm():
             action[1] = 2
         if userInput == 'd'  or userInput == 'D':
             action[1] = 6
+        if userInput == 'm'  or userInput == 'M':
+            action[1] = 10
         if userInput == 'n'  or userInput == 'N':
             finish_manualMode = True
     
@@ -280,10 +282,25 @@ class Robot_Movement_argorithm():
                 #작동 코드
                 if self.ball_scope_level == 0:
                     self.action[1] = 0
-                    if rpnA[0]>=0.6:
+                    if rpnA[0]>=0.55:
                         self.action[2] = self.action[2] + 5
-                    elif rpnA[0]<=0.4:
+                    elif rpnA[0]<=0.45:
                         self.action[2] = self.action[2] - 5
+                    else:
+                        self.ball_scope_level = 1
+
+                elif self.ball_scope_level == 1:
+                    self.action[1] = 0
+                    if rpnA[1]>=0.55:
+                        self.action[3] = self.action[3] + 5
+                    elif rpnA[1]<=0.45:
+                        self.action[3] = self.action[3] - 5
+                    else:
+                        self.ball_scope_level = 2
+                elif self.ball_scope_level == 2:
+                    print("scope head finish..")
+                    env.close()
+
 
         return self.action
                 
@@ -337,6 +354,7 @@ if __name__ == "__main__":
         elif RMA_mode == RMA_mode_list[1]:
             action = RMA.set_action(received_position_npArr,"find_ball_and_set_robot_direct_to_ball")
         #action = [2,0,0,0]
+        print(action)
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action,behavior_name)
         env.set_actions(behavior_name, actionTuple)
 
