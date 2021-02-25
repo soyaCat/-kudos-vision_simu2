@@ -223,6 +223,26 @@ class Robot_Movement_argorithm():
         self.ball_scope_level = 0
         self.mode_order_list = ["find_ball_and_set_robot_direct_to_ball"]
 
+    def manualmode(self):
+        print("Manual Mode...")
+        print("you can handle your robot by input 'w,a,s,d' and finish manual mode by input 'n'...")
+        action = [3,0,0,0]
+        finish_manualMode = False
+        userInput = input("UserInput :: ")
+        if userInput == 'w'  or userInput == 'W':
+            action[1] = 8
+        if userInput == 'a'  or userInput == 'A':
+            action[1] = 4
+        if userInput == 's'  or userInput == 'S':
+            action[1] = 2
+        if userInput == 'd'  or userInput == 'D':
+            action[1] = 6
+        if userInput == 'n'  or userInput == 'N':
+            finish_manualMode = True
+    
+        return action, finish_manualMode
+
+
     def set_action(self,rpnA, mode):
         #npnA[ballPosX, ballPosY, goalPosX, goalPosY]
         #action[3(조종모드), (2,4,6,8)키 패드에 따른 로봇 움직이기, 머리 팬(-360~360), 머리 틸트(-360~360)]
@@ -257,6 +277,10 @@ class Robot_Movement_argorithm():
 
 if __name__ == "__main__":
     write_train_txt_file_for_yolo(totalEpisodeCount)
+    RMA = Robot_Movement_argorithm()
+    RMA_mode_list = ["Manual_mode",
+                    "AutoMatic_mode"]
+    RMA_mode = RMA_mode_list[0]
     context = zmq.Context()
     socket = context.socket(zmq.REP)
     socket.bind("tcp://*:9010")
@@ -292,9 +316,13 @@ if __name__ == "__main__":
 
         received_position_npArr = znp.recv_array(socket)
         print("receive msg from client:", received_position_npArr)
-
-        action = set_action(received_position_npArr,"find_ball_and_set_robot_direct_to_ball")
-        action = [2,0,0,0]
+        if RMA_mode == RMA_mode_list[0]:
+            action, finish_manual_mode =  RMA.manualmode()
+            if finish_manual_mode == True:
+                RMA_mode = RMA_mode_list[1]
+        elif RMA_mode == RMA_mode_list[1]:
+            action = RMA.set_action(received_position_npArr,"find_ball_and_set_robot_direct_to_ball")
+        #action = [2,0,0,0]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action,behavior_name)
         env.set_actions(behavior_name, actionTuple)
 
