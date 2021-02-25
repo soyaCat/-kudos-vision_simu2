@@ -301,10 +301,7 @@ class Robot_Movement_argorithm():
                     print("scope head finish..")
                     env.close()
 
-
         return self.action
-                
-
 
 if __name__ == "__main__":
     write_train_txt_file_for_yolo(totalEpisodeCount)
