@@ -101,28 +101,37 @@ public class robotAgent : Agent
             {
                 if (i != randomInt)
                     footballs[i].gameObject.SetActive(false);
-                else
+                else 
                     footballs[i].gameObject.SetActive(true);
             }
             handleRobot.transform.position = new Vector3(Random.Range(-6f, 6f), 1.875f, Random.Range(-11f, 11f));
-            var distance_Robot_ball = 8f;
-            while(true)
+            if(move_mode == 0)//시선이 되도록 공 근처로 가도록 설정
             {
-                if (distance_Robot_ball >= 8f)
+                var distance_Robot_ball = 8f;
+                while(true)
                 {
-                    footballs[randomInt].transform.position = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
-                    footballs[randomInt].transform.eulerAngles = new Vector3(Random.Range(0f, 180f), Random.Range(0f, 180f), Random.Range(0f, 180f));
-                    distance_Robot_ball = Vector3.Distance(handleRobot.transform.position, footballs[randomInt].transform.position);
+                    if (distance_Robot_ball >= 8f)
+                    {
+                        footballs[randomInt].transform.position = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
+                        footballs[randomInt].transform.eulerAngles = new Vector3(Random.Range(0f, 180f), Random.Range(0f, 180f), Random.Range(0f, 180f));
+                        distance_Robot_ball = Vector3.Distance(handleRobot.transform.position, footballs[randomInt].transform.position);
+                    }
+                    else
+                        break;
                 }
-                else
-                    break;
+                var Balldistance = Vector3.Distance(handleRobot.transform.position, footballs[randomInt].transform.position);
+                randomLookAtPosition = footballs[randomInt].transform.position + new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f))*(Balldistance/2.3f);
             }
-            var Balldistance = Vector3.Distance(handleRobot.transform.position, footballs[randomInt].transform.position);
-            randomLookAtPosition = footballs[randomInt].transform.position + new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f))*(Balldistance/2.3f);
+            else if(move_mode == 1)//시선을 공에 상관없이 아무데나 둠
+            {
+                footballs[randomInt].transform.position = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
+                randomLookAtPosition = new Vector3(Random.Range(-6f, 6f), 1.875f, Random.Range(-11f, 11f));
+            }
             lookAtTarget.transform.position = randomLookAtPosition;
             cameraPack.transform.LookAt(lookAtTarget.transform);
             handleRobot.transform.eulerAngles = new Vector3(0f,cameraPack.transform.eulerAngles.y,0f);
             cameraPack.transform.eulerAngles = new Vector3(cameraPack.transform.eulerAngles.x, handleRobot.transform.eulerAngles.y, 0f);
+
         }
         else if(nextPose == 3)
         {
@@ -154,6 +163,13 @@ public class robotAgent : Agent
             {
                 next_move_point = current_Robot_position;
                 next_lot_point = current_Robot_Angle + new Vector3(0f, 20f, 0f);
+            }
+            else if (move_mode == 10)
+            {
+                next_move_point = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
+                next_lot_point = new Vector3(0f, Random.Range(0f, 360f), 0f);
+                Soccer_Ball.transform.position = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
+                Soccer_Ball.transform.eulerAngles = new Vector3(Random.Range(0f, 180f), Random.Range(0f, 180f), Random.Range(0f, 180f));
             }
             else
             {
