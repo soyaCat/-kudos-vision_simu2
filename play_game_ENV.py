@@ -249,7 +249,7 @@ class Robot_Movement_argorithm():
 
     def set_action(self,rpnA, mode):
         #npnA[ballPosX, ballPosY, goalPosX, goalPosY]
-        #action[3(조종모드), (2,4,6,8)키 패드에 따른 로봇 움직이기, 머리 팬(-360~360), 머리 틸트(-360~360)]
+        #action[3(조종모드), (2,4,6,8)키 패드에 따른 로봇 움직이기, 머리 팬(-360~360), 머리 틸트(-10~70)]
 
         if self.mode_order_list[mode] == self.mode_order_list[0]:
             if rpnA[0] == -1.0 and rpnA[1] == -1.0:
@@ -264,11 +264,11 @@ class Robot_Movement_argorithm():
                     self.action[3] = 60
                     self.sidemoveCount = 0
                     self.ball_find_level = 1
-                elif self.ball_find_level == 1:
+                if self.ball_find_level == 1:
                     self.action[3] = self.action[3] - 10
                     if self.action[3]<=0:
                         self.ball_find_level = 2
-                elif self.ball_find_level == 2:
+                if self.ball_find_level == 2:
                     self.action[1] = 4
                     self.sidemoveCount = self.sidemoveCount + 1
                     if self.sidemoveCount>40:
@@ -289,7 +289,7 @@ class Robot_Movement_argorithm():
                     else:
                         self.ball_scope_level = 1
 
-                elif self.ball_scope_level == 1:
+                if self.ball_scope_level == 1:
                     self.action[1] = 0
                     if rpnA[1]>=0.55:
                         self.action[3] = self.action[3] + 5
@@ -298,7 +298,7 @@ class Robot_Movement_argorithm():
                     else:
                         self.ball_scope_level = 2
 
-                elif self.ball_scope_level == 2:
+                if self.ball_scope_level == 2:
                     if self.action[2] >= 5:
                         self.action[1] = 6
                         self.ball_scope_level = 0
