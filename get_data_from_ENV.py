@@ -21,28 +21,35 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-totalEpisodeCount = 1
+normal_get_dataCount = 20
+super_Random_EpisodeCount = 0
+super_close_EpisodeCount = 0
+
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
 list_index_for_ALL = 0
 list_index_for_ball = 1
-list_index_for_flag = 2
-list_index_for_stage = 7
-list_index_for_goal1_detection = 3
-list_index_for_goal2_detection = 5
-list_index_for_goal1_range = 4
-list_index_for_goal2_range = 6
+list_index_for_flag1 = 2
+list_index_for_flag2 = 4
+list_index_for_flag1_range = 3
+list_index_for_flag2_range = 5
+list_index_for_stage = 10
+list_index_for_goal1_detection = 6
+list_index_for_goal2_detection = 8
+list_index_for_goal1_range = 7
+list_index_for_goal2_range = 9
 
-generate_ball_map = True
-generate_stage = True
-generate_flag = True
-generate_ball = True
-generate_goal_dectecion = True
-generate_goal_range = True
+generate_ball_map = False
+generate_stage = False
+generate_flag = False
+generate_ball = False
+generate_goal_dectecion = False
+generate_goal_range = False
 generate_yolo_txt_file = True
 
 write_txt_file_ball_pos = True
 write_txt_file_goal_pos = True
+write_txt_file_flag_pos = True
 
 def get_result_about_Is_same_1D_npArr(myArr1, myArr2):
     result = True
@@ -147,8 +154,8 @@ def get_txt_line_for_yolo_txt(episodeCount, left, bottom, right, top, ID):
     data = str(ID)+" "+str(round(height_center,6))+" "+str(round(width_center,6))+" "+str(round(height_distance, 6))+" "+str(round(width_distance, 6)) + "\n"
     
     return data
-
-def write_txt_file_like_yolo_mark(episodeCount, ball_list, goal1_list, goal2_list, no_ball, no_goal1, no_goal2):
+#(episodeCount, ball_pos, goal1_pos, goal2_pos, flag1_pos, flag2_pos, ball_result, goal1_result, goal2_result, flag1_result, flag2_result)
+def write_txt_file_like_yolo_mark(episodeCount, ball_list, goal1_list, goal2_list, flag1_list, flag2_list ,no_ball, no_goal1, no_goal2, no_flag1, no_flag2):
     f = open("./made_data/"+str(episodeCount)+"_ALL.txt", 'w')
     if no_ball == False:
         left = ball_list[0]
@@ -171,6 +178,20 @@ def write_txt_file_like_yolo_mark(episodeCount, ball_list, goal1_list, goal2_lis
         top = goal2_list[3]
         data = get_txt_line_for_yolo_txt(episodeCount, left, bottom, right, top, 1)
         f.write(data)
+    if no_flag1 == False:
+        left = flag1_list[0]
+        bottom = flag1_list[1]
+        right = flag1_list[2]
+        top = flag1_list[3]
+        data = get_txt_line_for_yolo_txt(episodeCount, left, bottom, right, top, 2)
+        f.write(data)
+    if no_flag2 == False:
+        left = flag2_list[0]
+        bottom = flag2_list[1]
+        right = flag2_list[2]
+        top = flag2_list[3]
+        data = get_txt_line_for_yolo_txt(episodeCount, left, bottom, right, top, 2)
+        f.write(data)
 
     f.close()
 
@@ -190,6 +211,12 @@ def save_numpy_file(append_name, list_index, wfnliiocn):
         im.save(save_picture_path+str(list_index)+'.jpg')
 
 if __name__ == "__main__":
+    totalEpisodeCount = super_close_EpisodeCount + super_Random_EpisodeCount + normal_get_dataCount
+    start_super_Random_EpisodeCount = normal_get_dataCount
+    start_super_close_EpisodeCount = normal_get_dataCount + super_Random_EpisodeCount
+    print(totalEpisodeCount)
+    print(start_super_Random_EpisodeCount)
+    print(start_super_close_EpisodeCount)
     write_train_txt_file_for_yolo(totalEpisodeCount)
     for episodeCount in tqdm(range(totalEpisodeCount)):
         behavior_name = behavior_names[0]
@@ -205,7 +232,10 @@ if __name__ == "__main__":
         if generate_ball == True:
             save_numpy_file('_ball', list_index_for_ball, wfnliiocn)
         if generate_flag == True:
-            save_numpy_file('_flag', list_index_for_flag, wfnliiocn)
+            save_numpy_file('_flag1', list_index_for_flag1, wfnliiocn)
+            save_numpy_file('_flag2', list_index_for_flag2, wfnliiocn)
+            save_numpy_file('_flag1_range', list_index_for_flag1_range, wfnliiocn)
+            save_numpy_file('_flag2_range', list_index_for_flag2_range, wfnliiocn)
         if generate_goal_dectecion == True:
             save_numpy_file('_goal1_detection', list_index_for_goal1_detection, wfnliiocn)
             save_numpy_file('_goal2_detection', list_index_for_goal2_detection, wfnliiocn)
@@ -218,18 +248,34 @@ if __name__ == "__main__":
         goal2_detection_npArr = vis_observation_list[list_index_for_goal2_detection]
         goal1_npArr = vis_observation_list[list_index_for_goal1_range]
         goal2_npArr = vis_observation_list[list_index_for_goal2_range]
+        flag1_detection_npArr = vis_observation_list[list_index_for_flag1]
+        flag1_npArr = vis_observation_list[list_index_for_flag1_range]
+        flag2_detection_npArr = vis_observation_list[list_index_for_flag2]
+        flag2_npArr = vis_observation_list[list_index_for_flag2_range]
         left = 0.0
         bottom = 0.0
         right = 1.0
         top = 1.0
+
         g1_left = 0.0
         g1_bottom = 0.0
         g1_right = 1.0
         g1_top = 1.0
+
         g2_left = 0.0
         g2_bottom = 0.0
         g2_right = 1.0
         g2_top = 1.0
+
+        f1_left = 0.0
+        f1_bottom = 0.0
+        f1_right = 1.0
+        f1_top = 1.0
+
+        f2_left = 0.0
+        f2_bottom = 0.0
+        f2_right = 1.0
+        f2_top = 1.0
 
         if write_txt_file_ball_pos == True:
             if np.sum(ball_npArr) != 0:
@@ -238,8 +284,12 @@ if __name__ == "__main__":
             else:
                 ball_map_npArr = np.zeros_like(ball_npArr)
             if generate_ball_map == True:
-                im_ball_map = Image.fromarray(ball_map_npArr.astype('uint8'), 'L')
-                im_ball_map.save(save_picture_path+str(episodeCount)+'_ball_map.jpg')
+                try:
+                    im_ball_map = Image.fromarray(ball_map_npArr.astype('uint8'), 'L')
+                    im_ball_map.save(save_picture_path+str(episodeCount)+'_ball_map.jpg')
+                except:
+                    im_ball_map = Image.fromarray(ball_map_npArr.astype('uint8'), 'RGB')
+                    im_ball_map.save(save_picture_path+str(episodeCount)+'_ball_map.jpg')
 
         if write_txt_file_goal_pos == True:
             if np.sum(goal1_detection_npArr) != 0:
@@ -249,19 +299,35 @@ if __name__ == "__main__":
                 g2_left, g2_bottom, g2_right, g2_top = get_rectangle_point_for_yolo_no_map(goal2_npArr)
                 g2_left, g2_bottom, g2_right, g2_top = mapping_point_to_float_shape(goal2_npArr, g2_left, g2_bottom, g2_right, g2_top)
 
+        if write_txt_file_flag_pos == True:
+            if np.sum(flag1_detection_npArr) != 0:
+                f1_left, f1_bottom, f1_right, f1_top = get_rectangle_point_for_yolo_no_map(flag1_npArr)
+                f1_left, f1_bottom, f1_right, f1_top = mapping_point_to_float_shape(flag1_npArr, f1_left, f1_bottom, f1_right, f1_top)
+            if np.sum(flag2_detection_npArr) != 0: 
+                f2_left, f2_bottom, f2_right, f2_top = get_rectangle_point_for_yolo_no_map(flag2_npArr)
+                f2_left, f2_bottom, f2_right, f2_top = mapping_point_to_float_shape(flag2_npArr, f2_left, f2_bottom, f2_right, f2_top)
+
 
         ball_result = get_result_about_Is_same_1D_npArr(np.array([left, bottom, right, top]), np.array([0.0, 0.0, 1.0, 1.0]))
         goal1_result = get_result_about_Is_same_1D_npArr(np.array([g1_left, g1_bottom, g1_right, g1_top]), np.array([0.0, 0.0, 1.0, 1.0]))
         goal2_result = get_result_about_Is_same_1D_npArr(np.array([g2_left, g2_bottom, g2_right, g2_top]), np.array([0.0, 0.0, 1.0, 1.0]))
-
+        flag1_result = get_result_about_Is_same_1D_npArr(np.array([f1_left, f1_bottom, f1_right, f1_top]), np.array([0.0, 0.0, 1.0, 1.0]))
+        flag2_result = get_result_about_Is_same_1D_npArr(np.array([f2_left, f2_bottom, f2_right, f2_top]), np.array([0.0, 0.0, 1.0, 1.0]))
 
         if generate_yolo_txt_file == True:
             ball_pos = [left, bottom, right, top]
             goal1_pos = [g1_left, g1_bottom, g1_right, g1_top]
             goal2_pos = [g2_left, g2_bottom, g2_right, g2_top]
-            write_txt_file_like_yolo_mark(episodeCount, ball_pos, goal1_pos, goal2_pos, ball_result, goal1_result, goal2_result)
-        
-        action = [2,0,0,0]
+            flag1_pos = [f1_left, f1_bottom, f1_right, f1_top]
+            flag2_pos = [f2_left, f2_bottom, f2_right, f2_top]
+            write_txt_file_like_yolo_mark(episodeCount, ball_pos, goal1_pos, goal2_pos, flag1_pos, flag2_pos, ball_result, goal1_result, goal2_result, flag1_result, flag2_result)
+
+        if episodeCount>start_super_Random_EpisodeCount and episodeCount<=start_super_close_EpisodeCount:
+            action = [2,1,0,0]
+        elif episodeCount>start_super_close_EpisodeCount:
+            action = [2,2,0,0]
+        else:
+            action = [2,0,0,0]
         actionTuple = ConversionDataType.ConvertList2DiscreteAction(action,behavior_name)
         env.set_actions(behavior_name, actionTuple)
 

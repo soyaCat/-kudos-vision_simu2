@@ -127,6 +127,23 @@ public class robotAgent : Agent
                 footballs[randomInt].transform.position = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
                 randomLookAtPosition = new Vector3(Random.Range(-6f, 6f), 1.875f, Random.Range(-11f, 11f));
             }
+            else if (move_mode == 2)//°øÀÌ ¾öÃ» °¡±õ°Ô ¹èÄ¡µÊ
+            {
+                var distance_Robot_ball = 2f;
+                while (true)
+                {
+                    if (distance_Robot_ball >= 2f)
+                    {
+                        footballs[randomInt].transform.position = new Vector3(Random.Range(-6f, 6f), 0.5f, Random.Range(-11f, 11f));
+                        footballs[randomInt].transform.eulerAngles = new Vector3(Random.Range(0f, 180f), Random.Range(0f, 180f), Random.Range(0f, 180f));
+                        distance_Robot_ball = Vector3.Distance(handleRobot.transform.position, footballs[randomInt].transform.position);
+                    }
+                    else
+                        break;
+                }
+                var Balldistance = Vector3.Distance(handleRobot.transform.position, footballs[randomInt].transform.position);
+                randomLookAtPosition = footballs[randomInt].transform.position + new Vector3(Random.Range(-0.5f, 0.5f), 0f, Random.Range(-0.5f, 0.5f)) * (Balldistance / 2.3f);
+            }
             lookAtTarget.transform.position = randomLookAtPosition;
             cameraPack.transform.LookAt(lookAtTarget.transform);
             handleRobot.transform.eulerAngles = new Vector3(0f,cameraPack.transform.eulerAngles.y,0f);
@@ -227,6 +244,7 @@ public class robotAgent : Agent
         if (Input.GetKey(KeyCode.N))
         {
             DiscreteActionsout[0] = 2;
+            DiscreteActionsout[1] = 2;
         }
         if (Input.GetKey(KeyCode.W))
         {
