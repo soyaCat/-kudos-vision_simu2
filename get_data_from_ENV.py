@@ -21,9 +21,9 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-normal_get_dataCount = 20
-super_Random_EpisodeCount = 0
-super_close_EpisodeCount = 0
+normal_get_dataCount = 2500
+super_Random_EpisodeCount = 500 
+super_close_EpisodeCount = 500
 
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
