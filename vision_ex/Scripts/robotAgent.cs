@@ -1,10 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 public class robotAgent : Agent
 {
@@ -24,7 +23,17 @@ public class robotAgent : Agent
     public GameObject lookAtTarget;
     public GameObject handleRobot;
 
+    public GameObject stadium1;
+    public GameObject Stadium2;
+    public GameObject Stadium3;
+
+    public GameObject Plane1;
+    public GameObject Plane2;
+    public GameObject Plane3;
+
     private List<GameObject> footballs = new List<GameObject>();
+    private List<GameObject> stadiums = new List<GameObject>();
+    private List<GameObject> Planes = new List<GameObject>();
 
     void Start()
     {
@@ -67,6 +76,7 @@ public class robotAgent : Agent
         var nextPose = 0;
         var randomInt = Random.Range(0, footballs.Count());
         var randomLookAtPosition = new Vector3(0f, 0f, 0f);
+
         switch (act0)
         {
             case 1:
@@ -79,6 +89,49 @@ public class robotAgent : Agent
                 nextPose = 3;//조종 모드: 로봇을 파이썬에서 조종할수 있게 함
                 break;
         }
+
+        if(act0 != 0 && act0 != 3)
+        {
+            var randomInt_stadium = Random.Range(0, stadiums.Count());
+            for (int i = 0; i < stadiums.Count(); i++)
+            {
+                if (i != randomInt_stadium)
+                    stadiums[i].gameObject.SetActive(false);
+                else
+                    stadiums[i].gameObject.SetActive(true);
+            }
+
+            var randomInt_Plane = Random.Range(0, Planes.Count());
+            for (int i = 0; i < Planes.Count(); i++)
+            {
+                if (i != randomInt_Plane)
+                    Planes[i].gameObject.SetActive(false);
+                else
+                    Planes[i].gameObject.SetActive(true);
+            }
+        }
+        else if(act0 == 3)
+        {
+            var randomInt_stadium = 0;
+            for (int i = 0; i < stadiums.Count(); i++)
+            {
+                if (i != randomInt_stadium)
+                    stadiums[i].gameObject.SetActive(false);
+                else
+                    stadiums[i].gameObject.SetActive(true);
+            }
+
+            var randomInt_Plane = 0;
+            for (int i = 0; i < Planes.Count(); i++)
+            {
+                if (i != randomInt_Plane)
+                    Planes[i].gameObject.SetActive(false);
+                else
+                    Planes[i].gameObject.SetActive(true);
+            }
+        }
+
+
         if(nextPose == 1)
         {
             Soccer_Ball.SetActive(false);
@@ -215,6 +268,18 @@ public class robotAgent : Agent
         footballs.Add(ball_sp2);
         footballs.Add(ball_sp3);
 
+        stadiums.Clear();
+        stadiums.Add(stadium1);
+        stadiums.Add(Stadium2);
+        stadiums.Add(Stadium3);
+
+        Planes.Clear();
+        Planes.Add(Plane1);
+        Planes.Add(Plane2);
+        Planes.Add(Plane3);
+
+
+
         var randomInt = Random.Range(0, footballs.Count());
         Soccer_Ball.SetActive(false);
         for (int i = 0; i < footballs.Count(); i++)
@@ -224,6 +289,25 @@ public class robotAgent : Agent
             else
                 footballs[i].gameObject.SetActive(true);
         }
+
+        var randomInt_stadium = Random.Range(0, stadiums.Count());
+        for (int i = 0; i < stadiums.Count(); i++)
+        {
+            if (i != randomInt_stadium)
+                stadiums[i].gameObject.SetActive(false);
+            else
+                stadiums[i].gameObject.SetActive(true);
+        }
+
+        var randomInt_Plane = Random.Range(0, Planes.Count());
+        for (int i = 0; i < Planes.Count(); i++)
+        {
+            if (i != randomInt)
+                Planes[i].gameObject.SetActive(false);
+            else
+                Planes[i].gameObject.SetActive(true);
+        }
+
         handleRobot.transform.position = new Vector3(0f, 2f, -7f);
         cameraPack.transform.eulerAngles = new Vector3(0f, 0f, 0f);
         footballs[randomInt].transform.position = new Vector3(0f, 0.5f, 0f);
