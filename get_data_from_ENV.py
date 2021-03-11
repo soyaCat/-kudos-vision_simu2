@@ -1,5 +1,6 @@
 from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.base_env import ActionTuple
+from mlagents_envs.side_channel.engine_configuration_channel import EngineConfigurationChannel
 import numpy as np
 import datetime
 import time
@@ -16,7 +17,9 @@ from tqdm import tqdm
 game = "-kudos-vision_simulator.exe"
 env_path = "./Build/"+game
 save_picture_path = "./made_data/"
-env = UnityEnvironment(file_name = env_path)
+channel = EngineConfigurationChannel()
+channel.set_configuration_parameters(time_scale = 1.0, target_frame_rate = 60, capture_frame_rate = 60)
+env = UnityEnvironment(file_name = env_path, side_channels = [channel])
 env.reset()
 behavior_names = list(env.behavior_specs)
 
