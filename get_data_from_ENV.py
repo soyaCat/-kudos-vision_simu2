@@ -8,14 +8,13 @@ import math
 from collections import deque
 import os
 
-import cv2
 import random
 import CustomFuncionFor_mlAgent as CF
 from PIL import Image
 from tqdm import tqdm
 
-game = "-kudos-vision_simulator.exe"
-env_path = "./Build/"+game
+game = "kudos_vision_simulator.x86_64"
+env_path = "./Linux_build/"+game
 save_picture_path = "./made_data/"
 channel = EngineConfigurationChannel()
 channel.set_configuration_parameters(time_scale = 1.0, target_frame_rate = 60, capture_frame_rate = 60)
@@ -24,9 +23,9 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-normal_get_dataCount = 2500
-super_Random_EpisodeCount = 500 
-super_close_EpisodeCount = 500
+normal_get_dataCount = 5
+super_Random_EpisodeCount = 0 
+super_close_EpisodeCount = 0
 
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
@@ -98,44 +97,16 @@ def get_rectangle_point_for_yolo(ball_npArr):
             top = candidate_hight
         if bottom<candidate_hight:
             bottom = candidate_hight
+    print(left, bottom, right, top)
 
     return left, bottom, right, top, ball_map_npArr
 
-def get_rectangle_point_for_yolo_no_map(ball_npArr):
-    '''
-    print(ball_npArr) #완전히 black인 부분은 [0,0,0]으로 표시된다.
-    print(np.shape(ball_npArr)) #416,416,3, 직관적으로 이미지의 박스는 left, bottom, right, top으로 표시되어야 함(크다,크다,작다,작다)
-    '''
-    im_width_size = np.shape(ball_npArr)[0]
-    im_hight_size = np.shape(ball_npArr)[1]
-    candidate_width_list = []
-    candidate_hight_list = []
-
-    for width in range(im_width_size):
-        Is_width_list_append = False
-        for hight in range(im_hight_size):
-            result = get_result_about_Is_same_1D_npArr(ball_npArr[width][hight], np.array([0, 0, 0]))
-            if result == False:
-                candidate_hight_list.append(hight)
-                if Is_width_list_append == False:
-                    candidate_width_list.append(width)
-                    Is_width_list_append = True
-    left = 0 #큰수여야함
-    bottom = 0#큰수여야함
-    right = im_width_size#작은수여야함
-    top = im_hight_size#작은수여야 함
-
-    for candidate_width in candidate_width_list:
-        if right>candidate_width:
-            right = candidate_width
-        if left<candidate_width:
-            left = candidate_width
-
-    for candidate_hight in candidate_hight_list:
-        if top>candidate_hight:
-            top = candidate_hight
-        if bottom<candidate_hight:
-            bottom = candidate_hight
+def better_get_rectangle_point_for_yolo_no_map(ball_npArr):
+    candidates_arr = np.where(ball_npArr != 0)
+    right = np.min(candidates_arr[0])
+    left = np.max(candidates_arr[0])
+    top = np.min(candidates_arr[1])
+    bottom = np.max(candidates_arr[1])
 
     return left, bottom, right, top
 
@@ -282,7 +253,8 @@ if __name__ == "__main__":
 
         if write_txt_file_ball_pos == True:
             if np.sum(ball_npArr) != 0:
-                left, bottom, right, top, ball_map_npArr = get_rectangle_point_for_yolo(ball_npArr)
+                ball_map_npArr = np.ones_like(ball_npArr)
+                left, bottom, right, top = better_get_rectangle_point_for_yolo_no_map(ball_npArr)
                 left, bottom, right, top = mapping_point_to_float_shape(ball_npArr, left, bottom, right, top)
             else:
                 ball_map_npArr = np.zeros_like(ball_npArr)
@@ -296,18 +268,18 @@ if __name__ == "__main__":
 
         if write_txt_file_goal_pos == True:
             if np.sum(goal1_detection_npArr) != 0:
-                g1_left, g1_bottom, g1_right, g1_top = get_rectangle_point_for_yolo_no_map(goal1_npArr)
+                g1_left, g1_bottom, g1_right, g1_top = better_get_rectangle_point_for_yolo_no_map(goal1_npArr)
                 g1_left, g1_bottom, g1_right, g1_top = mapping_point_to_float_shape(goal1_npArr, g1_left, g1_bottom, g1_right, g1_top)
             if np.sum(goal2_detection_npArr) != 0: 
-                g2_left, g2_bottom, g2_right, g2_top = get_rectangle_point_for_yolo_no_map(goal2_npArr)
+                g2_left, g2_bottom, g2_right, g2_top = better_get_rectangle_point_for_yolo_no_map(goal2_npArr)
                 g2_left, g2_bottom, g2_right, g2_top = mapping_point_to_float_shape(goal2_npArr, g2_left, g2_bottom, g2_right, g2_top)
 
         if write_txt_file_flag_pos == True:
             if np.sum(flag1_detection_npArr) != 0:
-                f1_left, f1_bottom, f1_right, f1_top = get_rectangle_point_for_yolo_no_map(flag1_npArr)
+                f1_left, f1_bottom, f1_right, f1_top = better_get_rectangle_point_for_yolo_no_map(flag1_npArr)
                 f1_left, f1_bottom, f1_right, f1_top = mapping_point_to_float_shape(flag1_npArr, f1_left, f1_bottom, f1_right, f1_top)
             if np.sum(flag2_detection_npArr) != 0: 
-                f2_left, f2_bottom, f2_right, f2_top = get_rectangle_point_for_yolo_no_map(flag2_npArr)
+                f2_left, f2_bottom, f2_right, f2_top = better_get_rectangle_point_for_yolo_no_map(flag2_npArr)
                 f2_left, f2_bottom, f2_right, f2_top = mapping_point_to_float_shape(flag2_npArr, f2_left, f2_bottom, f2_right, f2_top)
 
 

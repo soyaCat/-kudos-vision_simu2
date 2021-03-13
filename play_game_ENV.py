@@ -16,7 +16,6 @@ import os
 import zmq
 import zmqnumpy as znp
 
-import cv2
 import random
 import CustomFuncionFor_mlAgent as CF
 from PIL import Image
