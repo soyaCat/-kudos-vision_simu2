@@ -3,6 +3,15 @@
 쿠도스 쿠봇 비전 시뮬레이터 입니다.
 
 ---
+# 현재 의존 패키지 버전
+
+- unity용 ml_agent: 1.9.0
+- 파이썬용 ml_agent: 0.23.0
+- cuda 10.0
+- tensorflow 1.15.0
+- unity버전 20.4.22f
+
+---
 
 # 내부 파일들 설명
 - build, Linux_build

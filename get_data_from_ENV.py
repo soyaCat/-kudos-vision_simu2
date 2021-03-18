@@ -13,8 +13,8 @@ import CustomFuncionFor_mlAgent as CF
 from PIL import Image
 from tqdm import tqdm
 
-game = "kudos_vision_simulator.x86_64"
-env_path = "./Linux_build/"+game
+game = "-kudos-vision_simulator.exe"
+env_path = "./build/"+game
 save_picture_path = "./made_data/"
 channel = EngineConfigurationChannel()
 channel.set_configuration_parameters(time_scale = 1.0, target_frame_rate = 60, capture_frame_rate = 60)
@@ -23,7 +23,7 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-normal_get_dataCount = 5
+normal_get_dataCount = 2
 super_Random_EpisodeCount = 0 
 super_close_EpisodeCount = 0
 
@@ -42,11 +42,11 @@ list_index_for_goal1_range = 7
 list_index_for_goal2_range = 9
 
 generate_ball_map = False
-generate_stage = False
-generate_flag = False
-generate_ball = False
-generate_goal_dectecion = False
-generate_goal_range = False
+generate_stage = True
+generate_flag = True
+generate_ball = True
+generate_goal_dectecion = True
+generate_goal_range = True
 generate_yolo_txt_file = True
 
 write_txt_file_ball_pos = True
