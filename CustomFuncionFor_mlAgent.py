@@ -120,7 +120,8 @@ class AgentsHelper:
         vis_obs_list = []
         vec_obs = 0
         
-        for index, shape in enumerate(spec.observation_shapes):
+        for index, observation_spec in enumerate(spec.observation_specs):
+            shape = observation_spec.shape
             if len(shape) == 3:
                 if(terminal_steps.obs[index].size != 0):
                     vis_obs_list.append(terminal_steps.obs[index])

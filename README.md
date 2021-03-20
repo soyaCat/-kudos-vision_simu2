@@ -6,7 +6,7 @@
 # 현재 의존 패키지 버전
 
 - unity용 ml_agent: 1.9.0
-- 파이썬용 ml_agent: 0.23.0
+- 파이썬용 ml_agent: 0.25.0
 - cuda 10.0
 - tensorflow 1.15.0
 - unity버전 20.4.22f
