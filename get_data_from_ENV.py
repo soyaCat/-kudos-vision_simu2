@@ -1,15 +1,13 @@
+## 가상환경으로부터 데이터를 만들어주는 프로그램
+
 from mlagents_envs.environment import UnityEnvironment
 from mlagents_envs.base_env import ActionTuple
 from mlagents_envs.side_channel.engine_configuration_channel import EngineConfigurationChannel
 import numpy as np
-import datetime
-import time
-import math
-from collections import deque
-import os
 
 import random
-import CustomFuncionFor_mlAgent as CF
+import user_function.CustomFuncionFor_mlAgent as CF
+import user_function.image_filter as MY_IMAGE_FILTER
 from PIL import Image
 from tqdm import tqdm
 
@@ -23,9 +21,9 @@ env.reset()
 behavior_names = list(env.behavior_specs)
 
 ConversionDataType = CF.ConversionDataType()
-normal_get_dataCount = 2
-super_Random_EpisodeCount = 0 
-super_close_EpisodeCount = 0
+normal_get_dataCount = 1100
+super_Random_EpisodeCount = 100
+super_close_EpisodeCount = 100
 
 AgentsHelper = CF.AgentsHelper(env, string_log = None, ConversionDataType = ConversionDataType)
 write_file_name_list_index_instead_of_correct_name = False
@@ -42,16 +40,21 @@ list_index_for_goal1_range = 7
 list_index_for_goal2_range = 9
 
 generate_ball_map = False
-generate_stage = True
-generate_flag = True
-generate_ball = True
-generate_goal_dectecion = True
-generate_goal_range = True
+generate_stage = False
+generate_flag = False
+generate_ball = False
+generate_goal_dectecion = False
+generate_goal_range = False
 generate_yolo_txt_file = True
 
 write_txt_file_ball_pos = True
 write_txt_file_goal_pos = True
 write_txt_file_flag_pos = True
+
+enchant_random_option = {'gaussian_percentage': 0.2,
+                         'gaussian_range': (1,1),
+                         'motion_blur_percentage': 0.0,
+                         'motion_blur_range': (5, 15)}
 
 def get_result_about_Is_same_1D_npArr(myArr1, myArr2):
     result = True
@@ -184,6 +187,19 @@ def save_numpy_file(append_name, list_index, wfnliiocn):
     else:
         im.save(save_picture_path+str(list_index)+'.jpg')
 
+def image_filter_process(src):
+    random_float = random.random()
+    power = 0
+    if random_float < enchant_random_option['gaussian_percentage']:
+        power = random.randint(enchant_random_option['gaussian_range'][0], enchant_random_option['gaussian_range'][1])
+        src = MY_IMAGE_FILTER.custom_gaussian_filter(src=src, sigma=power)
+    random_float = random.random()
+    if random_float < enchant_random_option['motion_blur_percentage']:
+        power = random.randint(enchant_random_option['motion_blur_range'][0], enchant_random_option['motion_blur_range'][1])
+        src = MY_IMAGE_FILTER.custom_motion_blur_filter(src=src, power=power)
+    return src
+
+
 if __name__ == "__main__":
     totalEpisodeCount = super_close_EpisodeCount + super_Random_EpisodeCount + normal_get_dataCount
     start_super_Random_EpisodeCount = normal_get_dataCount
@@ -198,7 +214,8 @@ if __name__ == "__main__":
         vec_observation, vis_observation_list, done = AgentsHelper.getObservation(behavior_name)
         vis_observation = vis_observation_list[0]
 
-        im = Image.fromarray(vis_observation_list[list_index_for_ALL].astype('uint8'), 'RGB')
+        im = image_filter_process(vis_observation_list[list_index_for_ALL].astype('uint8'))
+        im = Image.fromarray(im, 'RGB')
         im.save(save_picture_path+str(episodeCount)+'_ALL.jpg')
         wfnliiocn = write_file_name_list_index_instead_of_correct_name
         if generate_stage == True:
